@@ -1,0 +1,99 @@
+.card {
+  aspect-ratio: 1;
+  cursor: pointer;
+  transition: all 0.5s;
+  perspective: 1000px;
+}
+
+.card.matched {
+  opacity: 0.7;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+}
+
+.card-front {
+  background: linear-gradient(to bottom right, #8b5cf6, #4f46e5);
+  border: 4px solid #6d28d9;
+  transition: box-shadow 0.3s;
+}
+
+.card-front:hover {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-front.matched {
+  border-color: #4ade80;
+}
+
+.card-inner.flipped .card-front {
+  transform: rotateY(180deg);
+  pointer-events: none;
+}
+
+.card-back {
+  background-color: white;
+  border: 4px solid #d8b4fe;
+  transform: rotateY(180deg);
+}
+
+.card-back.matched {
+  border-color: #4ade80;
+}
+
+.card-inner:not(.flipped) .card-back {
+  pointer-events: none;
+}
+
+.card-question {
+  color: white;
+  font-size: 2.25rem;
+  font-weight: bold;
+}
+
+.card-emoji {
+  font-size: 2.5rem;
+}
+
+/* Animación de victoria */
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.celebrate {
+  animation: celebrate 0.5s ease-in-out;
+}
+
+/* Efecto de resplandor para cartas emparejadas */
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); }
+}
+
+.glow-effect {
+  animation: glow 2s infinite;
+} 

@@ -1,38 +1,82 @@
-.App {
+.app-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #6b46c1;
+  transition: all 0.3s;
+}
+
+.app-title:hover {
+  color: #9f7aea;
+}
+
+.game-container {
+  margin-top: 1.5rem;
+}
+
+.cards-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.grid-easy {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-hard {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.game-over {
+  margin-top: 2rem;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.game-over-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.play-again-button {
+  background-color: #8b5cf6;
   color: white;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+  transform: scale(1);
 }
 
-.App-link {
-  color: #61dafb;
+.play-again-button:hover {
+  background-color: #7c3aed;
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Estilo para la malla de cartas responsiva */
+@media (max-width: 640px) {
+  .grid-easy {
+    grid-template-columns: repeat(3, 1fr);
   }
-  to {
-    transform: rotate(360deg);
+  
+  .grid-hard {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-easy, .grid-hard {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
