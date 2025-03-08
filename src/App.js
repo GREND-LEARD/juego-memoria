@@ -16,6 +16,7 @@ function App() {
   const [difficulty, setDifficulty] = useState(null); // null, 'easy', 'medium', 'hard'
   const [timer, setTimer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Configuración según dificultad
   const difficultyConfig = {
@@ -89,12 +90,26 @@ function App() {
         if (newMatchedCards.length === cards.length) {
           setGameOver(true);
           setIsPlaying(false);
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 5000); // Ocultar confeti después de 5 segundos
         }
         
         // Reiniciar las cartas volteadas
         setTimeout(() => setFlippedCards([]), 500);
       } else {
-        // Las cartas no coinciden, voltearlas de nuevo
+        // Las cartas no coinciden, aplicar animación de shake
+        const cardsElements = document.querySelectorAll('.card');
+        newFlippedCards.forEach(id => {
+          const cardElement = Array.from(cardsElements).find(
+            element => element.getAttribute('data-id') === id.toString()
+          );
+          if (cardElement) {
+            cardElement.classList.add('shake');
+            setTimeout(() => cardElement.classList.remove('shake'), 500);
+          }
+        });
+        
+        // Voltearlas de nuevo después de la animación
         setTimeout(() => setFlippedCards([]), 1000);
       }
     }
@@ -102,57 +117,49 @@ function App() {
 
   // Efecto para el temporizador
   useEffect(() => {
-    let interval = null;
-    
+    let interval;
     if (isPlaying && !gameOver) {
       interval = setInterval(() => {
-        setTimer(prevTimer => {
-          const newTime = prevTimer + 1;
-          
-          // Verificar si se alcanzó el límite de tiempo
-          if (difficulty && newTime >= difficultyConfig[difficulty].timeLimit) {
+        setTimer(prevTime => {
+          // Verificar si se acabó el tiempo
+          if (prevTime >= difficultyConfig[difficulty].timeLimit - 1) {
+            clearInterval(interval);
             setGameOver(true);
             setIsPlaying(false);
-            clearInterval(interval);
+            return difficultyConfig[difficulty].timeLimit;
           }
-          
-          return newTime;
+          return prevTime + 1;
         });
       }, 1000);
-    } else {
-      clearInterval(interval);
     }
     
     return () => clearInterval(interval);
-  }, [isPlaying, gameOver, difficulty, difficultyConfig]);
+  }, [isPlaying, difficulty, gameOver]);
 
+  // Renderizado condicional: pantalla de selección de dificultad o juego
   return (
     <div className="app-container">
-      <h1 className="app-title">
-        Juego de Memoria
-      </h1>
+      <h1 className="game-title">Juego de Memoria</h1>
       
-      {!difficulty ? (
+      {difficulty === null ? (
         <DifficultySelector onSelectDifficulty={startGame} />
       ) : (
-        <div className="game-container">
-          <GameStats
+        <>
+          <GameStats 
+            difficulty={difficulty}
             moves={moves}
-            timeElapsed={timer}
+            timer={timer}
             timeLimit={difficultyConfig[difficulty].timeLimit}
-            gameOver={gameOver}
-            matchedCards={matchedCards.length}
-            totalCards={cards.length}
-            onRestartGame={() => setDifficulty(null)}
+            onRestart={() => setDifficulty(null)}
           />
           
-          <div className={`cards-grid ${difficulty === 'hard' ? 'grid-hard' : 'grid-easy'}`}>
+          <div className={`game-board difficulty-${difficulty}`}>
             {cards.map(card => (
               <Card
                 key={card.id}
                 id={card.id}
                 emoji={card.emoji}
-                isFlipped={flippedCards.includes(card.id) || matchedCards.includes(card.id)}
+                isFlipped={flippedCards.includes(card.id) || card.isMatched}
                 isMatched={matchedCards.includes(card.id)}
                 onClick={handleCardClick}
               />
@@ -160,19 +167,34 @@ function App() {
           </div>
           
           {gameOver && (
-            <div className="game-over">
-              <h2 className="game-over-title">
-                {matchedCards.length === cards.length ? '¡Felicidades! 🎉' : 'Se acabó el tiempo ⏱️'}
-              </h2>
-              <button
-                className="play-again-button"
-                onClick={() => setDifficulty(null)}
-              >
-                Jugar de Nuevo
+            <div className="game-over-message">
+              {matchedCards.length === cards.length ? (
+                <p className="win-message">¡Felicidades! Has completado el juego en {moves} movimientos.</p>
+              ) : (
+                <p className="lose-message">¡Se acabó el tiempo! Inténtalo de nuevo.</p>
+              )}
+              <button className="restart-button" onClick={() => setDifficulty(null)}>
+                Volver a jugar
               </button>
             </div>
           )}
-        </div>
+          
+          {showConfetti && (
+            <div className="confetti-container">
+              {[...Array(50)].map((_, index) => (
+                <div 
+                  key={index} 
+                  className="confetti"
+                  style={{
+                    left: `${Math.random() * 100}vw`,
+                    animationDelay: `${Math.random() * 5}s`,
+                    backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

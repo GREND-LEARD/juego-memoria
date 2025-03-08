@@ -6,6 +6,7 @@ const Card = ({ id, emoji, isFlipped, isMatched, onClick }) => {
     <div
       className={`card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''}`}
       onClick={() => onClick(id)}
+      data-id={id}
     >
       <div className={`card-inner ${isFlipped ? 'flipped' : ''}`}>
         {/* Parte frontal (oculta) */}
