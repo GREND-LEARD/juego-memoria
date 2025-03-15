@@ -1,4 +1,22 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+import { IonApp, IonContent, IonHeader, IonTitle, IonToolbar, setupIonicReact } from '@ionic/react';
+
+/* Core CSS required for Ionic components to work properly */
+import '@ionic/react/css/core.css';
+
+/* Basic CSS for apps built with Ionic */
+import '@ionic/react/css/normalize.css';
+import '@ionic/react/css/structure.css';
+import '@ionic/react/css/typography.css';
+
+/* Optional CSS utils that can be commented out */
+import '@ionic/react/css/padding.css';
+import '@ionic/react/css/float-elements.css';
+import '@ionic/react/css/text-alignment.css';
+import '@ionic/react/css/text-transformation.css';
+import '@ionic/react/css/flex-utils.css';
+import '@ionic/react/css/display.css';
+
 import './App.css';
 
 // Componentes
@@ -6,17 +24,19 @@ import Card from './components/Card';
 import DifficultySelector from './components/DifficultySelector';
 import GameStats from './components/GameStats';
 
+setupIonicReact();
+
 function App() {
   // Estados del juego
-  const [cards, setCards] = useState([]);
-  const [flippedCards, setFlippedCards] = useState([]);
-  const [matchedCards, setMatchedCards] = useState([]);
-  const [moves, setMoves] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
-  const [difficulty, setDifficulty] = useState(null); // null, 'easy', 'medium', 'hard'
-  const [timer, setTimer] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [cards, setCards] = React.useState([]);
+  const [flippedCards, setFlippedCards] = React.useState([]);
+  const [matchedCards, setMatchedCards] = React.useState([]);
+  const [moves, setMoves] = React.useState(0);
+  const [gameOver, setGameOver] = React.useState(false);
+  const [difficulty, setDifficulty] = React.useState(null); // null, 'easy', 'medium', 'hard'
+  const [timer, setTimer] = React.useState(0);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [showConfetti, setShowConfetti] = React.useState(false);
 
   // Configuración según dificultad
   const difficultyConfig = {
@@ -116,7 +136,7 @@ function App() {
   };
 
   // Efecto para el temporizador
-  useEffect(() => {
+  React.useEffect(() => {
     let interval;
     if (isPlaying && !gameOver) {
       interval = setInterval(() => {
@@ -136,67 +156,75 @@ function App() {
     return () => clearInterval(interval);
   }, [isPlaying, difficulty, gameOver]);
 
-  // Renderizado condicional: pantalla de selección de dificultad o juego
   return (
-    <div className="app-container">
-      <h1 className="game-title">Juego de Memoria</h1>
-      
-      {difficulty === null ? (
-        <DifficultySelector onSelectDifficulty={startGame} />
-      ) : (
-        <>
-          <GameStats 
-            difficulty={difficulty}
-            moves={moves}
-            timer={timer}
-            timeLimit={difficultyConfig[difficulty].timeLimit}
-            onRestart={() => setDifficulty(null)}
-          />
+    <IonApp>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Juego de Memoria</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
+        <div className="app-container">
+          <h1 className="game-title">Juego de Memoria</h1>
           
-          <div className={`game-board difficulty-${difficulty}`}>
-            {cards.map(card => (
-              <Card
-                key={card.id}
-                id={card.id}
-                emoji={card.emoji}
-                isFlipped={flippedCards.includes(card.id) || card.isMatched}
-                isMatched={matchedCards.includes(card.id)}
-                onClick={handleCardClick}
+          {difficulty === null ? (
+            <DifficultySelector onSelectDifficulty={startGame} />
+          ) : (
+            <>
+              <GameStats 
+                difficulty={difficulty}
+                moves={moves}
+                timer={timer}
+                timeLimit={difficultyConfig[difficulty].timeLimit}
+                onRestart={() => setDifficulty(null)}
               />
-            ))}
-          </div>
-          
-          {gameOver && (
-            <div className="game-over-message">
-              {matchedCards.length === cards.length ? (
-                <p className="win-message">¡Felicidades! Has completado el juego en {moves} movimientos.</p>
-              ) : (
-                <p className="lose-message">¡Se acabó el tiempo! Inténtalo de nuevo.</p>
+              
+              <div className={`game-board difficulty-${difficulty}`}>
+                {cards.map(card => (
+                  <Card
+                    key={card.id}
+                    id={card.id}
+                    emoji={card.emoji}
+                    isFlipped={flippedCards.includes(card.id) || card.isMatched}
+                    isMatched={matchedCards.includes(card.id)}
+                    onClick={handleCardClick}
+                  />
+                ))}
+              </div>
+              
+              {gameOver && (
+                <div className="game-over-message">
+                  {matchedCards.length === cards.length ? (
+                    <p className="win-message">¡Felicidades! Has completado el juego en {moves} movimientos.</p>
+                  ) : (
+                    <p className="lose-message">¡Se acabó el tiempo! Inténtalo de nuevo.</p>
+                  )}
+                  <button className="restart-button" onClick={() => setDifficulty(null)}>
+                    Volver a jugar
+                  </button>
+                </div>
               )}
-              <button className="restart-button" onClick={() => setDifficulty(null)}>
-                Volver a jugar
-              </button>
-            </div>
+              
+              {showConfetti && (
+                <div className="confetti-container">
+                  {[...Array(50)].map((_, index) => (
+                    <div 
+                      key={index} 
+                      className="confetti"
+                      style={{
+                        left: `${Math.random() * 100}vw`,
+                        animationDelay: `${Math.random() * 5}s`,
+                        backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
-          
-          {showConfetti && (
-            <div className="confetti-container">
-              {[...Array(50)].map((_, index) => (
-                <div 
-                  key={index} 
-                  className="confetti"
-                  style={{
-                    left: `${Math.random() * 100}vw`,
-                    animationDelay: `${Math.random() * 5}s`,
-                    backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`,
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </>
-      )}
-    </div>
+        </div>
+      </IonContent>
+    </IonApp>
   );
 }
 
